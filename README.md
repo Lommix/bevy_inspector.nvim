@@ -9,8 +9,7 @@ using the telescope API with the new BRP-API introduced in bevy 0.15
 return {
 	"lommix/bevy_inspector.nvim",
 	dependencies = {
-		"MunifTanjim/nui.nvim",
-		"nvim-lua/plenary.nvim",
+		"nvim-telescope/telescope.nvim",
 	},
 	config = function()
 		require("bevy_inspector").setup()
