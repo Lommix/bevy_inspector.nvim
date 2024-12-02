@@ -43,6 +43,12 @@ function Inspector:open()
 				}
 			end,
 		}),
+		layout_config = {
+			horizontal = {
+				preview_width = 0.7,
+				results_width = 0.3,
+			},
+		},
 		previewer = previewers.new_buffer_previewer({
 			title = "entity components",
 			define_preview = function(buf, entry)
@@ -91,6 +97,12 @@ function Inspector:open_named()
 				}
 			end,
 		}),
+		layout_config = {
+			horizontal = {
+				preview_width = 0.5,
+				results_width = 0.5,
+			},
+		},
 		previewer = previewers.new_buffer_previewer({
 			title = "entity components",
 			define_preview = function(buf, entry)
@@ -127,16 +139,27 @@ function Inspector:open_comps(entity)
 		finder = finders.new_table({
 			results = comps,
 		}),
+		layout_config = {
+			horizontal = {
+				preview_width = 0.5,
+				results_width = 0.5,
+			},
+		},
 		previewer = previewers.new_buffer_previewer({
 			title = "components detail",
 			define_preview = function(buf, entry)
 				local detail = self.api:get_component_detail(entity, entry.value)
+
+				if detail == nil then
+					return
+				end
+
 				local formatted = bevy_util.pretty_table_str(detail)
 				vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, vim.split(formatted, "\n"))
 			end,
 		}),
 		sorter = conf.generic_sorter(),
-		attach_mappings = function(prompt_bufnr)
+		attach_mappings = function()
 			actions.select_default:replace(function() end)
 			return true
 		end,
