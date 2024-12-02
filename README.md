@@ -3,6 +3,10 @@
 A simple remote entity & component inspector inside Neovim
 using the telescope API with the new BRP-API introduced in bevy 0.15
 
+
+https://github.com/user-attachments/assets/0d48ded3-31da-49bf-ae5b-4ba5aa6fd6e1
+
+
 ## Installation
 
 ```lua
