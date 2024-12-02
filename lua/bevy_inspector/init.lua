@@ -13,11 +13,14 @@ local M = {
 --- @param opts ?BevyRemoteConfig
 M.setup = function(opts)
 	M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})
-	print("hello world!")
 end
 
--- vim.g.ollamachad_marked_files = {}
--- vim.api.nvim_create_user_command("OLLAMAMARK", function() end, {})
--- vim.api.nvim_create_user_command("OLLAMACLEAR", function() end, {})
+vim.api.nvim_create_user_command("BevyInspect", function()
+	require("bevy_inspector.inspector"):new():open()
+end, {})
+
+vim.api.nvim_create_user_command("BevyInspectNamed", function()
+	require("bevy_inspector.inspector"):new():open_named()
+end, {})
 
 return M
