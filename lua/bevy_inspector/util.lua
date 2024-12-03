@@ -187,10 +187,10 @@ M.component_previewer = function(entity)
 end
 
 M.component_formatter = function(entry)
-	vim.print(entry)
+	local display = string.match(entry, ".*::(.*)")
 	return {
 		value = entry,
-		display = entry,
+		display = display,
 		ordinal = entry,
 	}
 end

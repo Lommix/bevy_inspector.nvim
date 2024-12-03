@@ -87,6 +87,7 @@ function Inspector:query_component()
 
 	bevy_util.spawn_picker(comps, {
 		title = "select component to query",
+		format = bevy_util.component_formatter,
 		callback = function(entry)
 			local entities = self.api:get_entites_with_component(entry)
 
