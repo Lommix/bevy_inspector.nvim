@@ -16,11 +16,15 @@ M.setup = function(opts)
 end
 
 vim.api.nvim_create_user_command("BevyInspect", function()
-	require("bevy_inspector.inspector"):new():open()
+	require("bevy_inspector.inspector"):new():show_all_entities()
 end, {})
 
 vim.api.nvim_create_user_command("BevyInspectNamed", function()
-	require("bevy_inspector.inspector"):new():open_named()
+	require("bevy_inspector.inspector"):new():show_named_entities()
+end, {})
+
+vim.api.nvim_create_user_command("BevyInspectQuery", function()
+	require("bevy_inspector.inspector"):new():query_component()
 end, {})
 
 return M

@@ -3,9 +3,7 @@
 A simple remote entity & component inspector inside Neovim
 using the telescope API with the new BRP-API introduced in bevy 0.15
 
-
 https://github.com/user-attachments/assets/0d48ded3-31da-49bf-ae5b-4ba5aa6fd6e1
-
 
 ## Installation
 
@@ -16,12 +14,20 @@ return {
 		"nvim-telescope/telescope.nvim",
 	},
 	config = function()
-		require("bevy_inspector").setup({
-            -- you only need to call setup, if you want to provide a custom url/port
+
+        -- only required when using custom URL
+		-- require("bevy_inspector").setup({
 	        -- url = "http://127.0.0.1:15702",
-        })
-		vim.keymap.set("n", "<leader>zz", ":BevyInspect<Cr>", {silent=true})
-		vim.keymap.set("n", "<leader>uu", ":BevyInspectNamed<Cr>", {silent=true})
+        -- })
+
+        -- lists all entities
+		vim.keymap.set("n", "<leader>z", ":BevyInspect<Cr>", { silent = true })
+
+        -- lists all named entities
+		vim.keymap.set("n", "<leader>u", ":BevyInspectNamed<Cr>", { silent = true })
+
+        -- query a single component, continues to list all matching entities
+		vim.keymap.set("n", "<leader>i", ":BevyInspectQuery<Cr>", { silent = true })
 	end,
 }
 ```

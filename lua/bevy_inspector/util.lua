@@ -1,3 +1,10 @@
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local previewers = require("telescope.previewers")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_states = require("telescope.actions.state")
+
 local M = {}
 
 --- @param node table
@@ -80,6 +87,112 @@ M.pretty_table_str = function(node)
 
 	table.insert(output, output_str)
 	return table.concat(output)
+end
+
+---@class BevyPicker
+---@field callback fun(entry: table)?
+---@field title string?
+---@field picker any?
+---@field format fun(entry:any)?
+
+---@param opts BevyPicker
+---@param data table
+M.spawn_picker = function(data, opts)
+	local finder = {}
+
+	if opts.format ~= nil then
+		finder = finders.new_table({
+			results = data,
+			entry_maker = opts.format,
+		})
+	else
+		finder = finders.new_table({
+			results = data,
+		})
+	end
+
+	local picker = pickers:new({
+		prompt_title = opts.title,
+		layout_config = {
+			horizontal = {
+				preview_width = 0.6,
+				results_width = 0.4,
+			},
+		},
+		finder = finder,
+		sorter = conf.generic_sorter(),
+		attach_mappings = function(prompt_bufnr)
+			actions.select_default:replace(function()
+				local selection = action_states.get_selected_entry()
+				actions.close(prompt_bufnr)
+				opts.callback(selection.value)
+			end)
+			return true
+		end,
+	})
+
+	if opts.picker ~= nil then
+		picker.previewer = opts.picker
+	end
+
+	picker:find()
+end
+
+M.entity_previewer = previewers.new_buffer_previewer({
+	title = "entity components",
+	define_preview = function(buf, entry)
+		local api = require("bevy_inspector.api"):new()
+		local comps = api:list_components(entry.value)
+		if comps == nil then
+			return
+		end
+		vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, comps)
+	end,
+})
+
+M.entity_formatter = function(entry)
+	local displayed = "[" .. tostring(entry.entity) .. "]"
+
+	local _, comp = next(entry.components)
+
+	if comp ~= nil and comp.name ~= nil then
+		local name = comp.name
+		displayed = displayed .. ":" .. name
+	else
+		displayed = displayed .. ":Entity"
+	end
+
+	return {
+		value = entry.entity,
+		display = displayed,
+		ordinal = displayed,
+	}
+end
+
+M.component_previewer = function(entity)
+	return previewers.new_buffer_previewer({
+		title = "components detail",
+		define_preview = function(buf, entry)
+			local api = require("bevy_inspector.api"):new()
+			local detail = api:get_component_detail(entity, entry.value)
+
+			if detail == nil then
+				return
+			end
+
+			local formatted = M.pretty_table_str(detail)
+			vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, vim.split(formatted, "\n"))
+		end,
+	})
+end
+
+M.component_formatter = function(entry)
+	vim.print(entry)
+	return {
+		value = entry,
+		display = entry,
+		ordinal = entry,
+	}
 end
 
 return M

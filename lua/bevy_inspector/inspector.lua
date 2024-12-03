@@ -23,148 +23,128 @@ function Inspector:new()
 end
 
 --- Opens a picker for all entities
-function Inspector:open()
+function Inspector:show_all_entities()
 	local query_result = self.api:get_all_entites()
 
 	if query_result == nil then
-		print("no named entities")
 		return
 	end
 
-	local picker = pickers:new({
-		prompt_title = "search entity",
-		finder = finders.new_table({
-			results = query_result,
-			entry_maker = function(entry)
-				return {
-					value = entry.entity,
-					display = tostring(entry.entity),
-					ordinal = tostring(entry.entity),
-				}
-			end,
-		}),
-		layout_config = {
-			horizontal = {
-				preview_width = 0.7,
-				results_width = 0.3,
-			},
-		},
-		previewer = previewers.new_buffer_previewer({
-			title = "entity components",
-			define_preview = function(buf, entry)
-				local comps = self.api:list_components(entry.value)
-
-				if comps == nil then
-					return
-				end
-
-				vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, comps)
-			end,
-		}),
-		sorter = conf.generic_sorter(),
-		attach_mappings = function(prompt_bufnr)
-			actions.select_default:replace(function()
-				local selection = action_states.get_selected_entry()
-				actions.close(prompt_bufnr)
-				self:open_comps(selection.value)
-			end)
-			return true
+	bevy_util.spawn_picker(query_result, {
+		title = "select entity",
+		format = bevy_util.entity_formatter,
+		picker = bevy_util.entity_previewer,
+		callback = function(entry)
+			self:show_entity_comps(entry)
 		end,
 	})
-	picker:find()
 end
 
 --- Opens a picker for all named entities
-function Inspector:open_named()
+function Inspector:show_named_entities()
 	local query_result = self.api:get_named_entites()
 
 	if query_result == nil then
-		print("no entities")
 		return
 	end
 
-	local picker = pickers:new({
-		prompt_title = "search named entity",
-		finder = finders.new_table({
-			results = query_result,
-			entry_maker = function(entry)
-				local _, comp = next(entry.components)
-				local name = comp.name
-				return {
-					value = entry.entity,
-					display = name .. ":" .. tostring(entry.entity),
-					ordinal = name .. ":" .. tostring(entry.entity),
-				}
-			end,
-		}),
-		layout_config = {
-			horizontal = {
-				preview_width = 0.5,
-				results_width = 0.5,
-			},
-		},
-		previewer = previewers.new_buffer_previewer({
-			title = "entity components",
-			define_preview = function(buf, entry)
-				local comps = self.api:list_components(entry.value)
-
-				if comps == nil then
-					return
-				end
-
-				vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, comps)
-			end,
-		}),
-		sorter = conf.generic_sorter(),
-		attach_mappings = function(prompt_bufnr)
-			actions.select_default:replace(function()
-				local selection = action_states.get_selected_entry()
-				actions.close(prompt_bufnr)
-				self:open_comps(selection.value)
-			end)
-			return true
+	bevy_util.spawn_picker(query_result, {
+		title = "select named entity",
+		format = bevy_util.entity_formatter,
+		picker = bevy_util.entity_previewer,
+		callback = function(entry)
+			self:show_entity_comps(entry)
 		end,
 	})
-	picker:find()
 end
 
 --- Opens a picker for all components with live value preview
 ---@param entity number
-function Inspector:open_comps(entity)
+function Inspector:show_entity_comps(entity)
 	local comps = self.api:list_components(entity)
 
-	local picker = pickers:new({
-		prompt_title = "search components of " .. entity,
-		finder = finders.new_table({
-			results = comps,
-		}),
-		layout_config = {
-			horizontal = {
-				preview_width = 0.5,
-				results_width = 0.5,
-			},
-		},
-		previewer = previewers.new_buffer_previewer({
-			title = "components detail",
-			define_preview = function(buf, entry)
-				local detail = self.api:get_component_detail(entity, entry.value)
+	if comps == nil then
+		return
+	end
 
-				if detail == nil then
-					return
-				end
-
-				local formatted = bevy_util.pretty_table_str(detail)
-				vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, vim.split(formatted, "\n"))
-			end,
-		}),
-		sorter = conf.generic_sorter(),
-		attach_mappings = function()
-			actions.select_default:replace(function() end)
-			return true
+	bevy_util.spawn_picker(comps, {
+		title = "[Entity:" .. tostring(entity) .. "] select component to watch",
+		format = bevy_util.component_formatter,
+		picker = bevy_util.component_previewer(entity),
+		callback = function(entry)
+			self:watch_component(entity, entry)
 		end,
 	})
+end
 
-	picker:find()
+--- List all components
+function Inspector:query_component()
+	local comps = self.api:list_all_components()
+
+	if comps == nil then
+		return
+	end
+
+	bevy_util.spawn_picker(comps, {
+		title = "select component to query",
+		callback = function(entry)
+			local entities = self.api:get_entites_with_component(entry)
+
+			if entities == nil then
+				return
+			end
+
+			bevy_util.spawn_picker(entities, {
+				title = "select named entity",
+				format = bevy_util.entity_formatter,
+				picker = bevy_util.entity_previewer,
+				callback = function(entry)
+					self:show_entity_comps(entry)
+				end,
+			})
+		end,
+	})
+end
+
+---@param entity number
+---@param component string
+function Inspector:watch_component(entity, component)
+	local Popup = require("nui.popup")
+	local event = require("nui.utils.autocmd").event
+	-- Create NUI popup
+	local popup = Popup({
+		enter = true,
+		focusable = true,
+		border = {
+			style = "single",
+			text = {
+				top = "[ Component Watcher ]",
+				top_align = "center",
+			},
+		},
+		position = "50%",
+		size = {
+			width = 60,
+			height = 20,
+		},
+	})
+
+	popup:mount()
+	local function update_popup_content()
+		local res = self.api:get_component_detail(entity, component)
+		local formatted = bevy_util.pretty_table_str(res)
+		vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, vim.split(formatted, "\n"))
+	end
+
+	local interval = 50
+	local timer = vim.loop.new_timer()
+	timer:start(0, interval, vim.schedule_wrap(update_popup_content))
+
+	popup:on(event.BufLeave, function()
+		timer:stop()
+		timer:close()
+		popup:unmount()
+	end)
 end
 
 return Inspector
