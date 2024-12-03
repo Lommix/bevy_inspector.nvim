@@ -16,7 +16,10 @@ return {
 		"nvim-telescope/telescope.nvim",
 	},
 	config = function()
-		require("bevy_inspector").setup()
+		require("bevy_inspector").setup({
+            -- you only need to call setup, if you want to provide a custom url/port
+	        -- url = "http://127.0.0.1:15702",
+        })
 		vim.keymap.set("n", "<leader>zz", ":BevyInspect<Cr>", {silent=true})
 		vim.keymap.set("n", "<leader>uu", ":BevyInspectNamed<Cr>", {silent=true})
 	end,

@@ -133,7 +133,6 @@ end
 function Inspector:open_comps(entity)
 	local comps = self.api:list_components(entity)
 
-	vim.print(comps)
 	local picker = pickers:new({
 		prompt_title = "search components of " .. entity,
 		finder = finders.new_table({
