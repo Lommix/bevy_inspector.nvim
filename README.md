@@ -12,6 +12,8 @@ return {
 	"lommix/bevy_inspector.nvim",
 	dependencies = {
 		"nvim-telescope/telescope.nvim",
+        "MunifTanjim/nui.nvim",
+        "nvim-lua/plenary.nvim",
 	},
 	config = function()
 
@@ -31,6 +33,12 @@ return {
 	end,
 }
 ```
+
+## Control flow
+
+Mostly boils down to this:
+
+`entitie list` -> `show entity components` -> `watch single component`
 
 ## In Bevy
 

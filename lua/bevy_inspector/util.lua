@@ -45,6 +45,8 @@ M.pretty_table_str = function(node)
 				local key
 				if type(k) == "number" or type(k) == "boolean" then
 					key = "[" .. tostring(k) .. "]"
+				elseif type(k) == "string" then
+					key = "['" .. M.trim_rust_struct(k) .. "']"
 				else
 					key = "['" .. tostring(k) .. "']"
 				end
@@ -146,7 +148,13 @@ M.entity_previewer = previewers.new_buffer_previewer({
 		if comps == nil then
 			return
 		end
-		vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, comps)
+
+		local out = {}
+		for _, comp in ipairs(comps) do
+			table.insert(out, M.trim_rust_struct(comp))
+		end
+
+		vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, out)
 	end,
 })
 
@@ -187,12 +195,25 @@ M.component_previewer = function(entity)
 end
 
 M.component_formatter = function(entry)
-	local display = string.match(entry, ".*::(.*)")
 	return {
 		value = entry,
-		display = display,
+		display = M.trim_rust_struct(entry),
 		ordinal = entry,
 	}
+end
+
+---@param path string
+M.trim_rust_struct = function(path)
+	local generic = path:match("<(.-)>")
+	if generic ~= nil then
+		generic = generic:match(".*::(.*)")
+		local struct = path:gsub("<(.-)>", "")
+		return struct:match(".*::(.*)") .. "<" .. generic .. ">"
+	elseif string.find(path, "::") then
+		return path:match(".*::(.*)")
+	else
+		return path
+	end
 end
 
 return M
