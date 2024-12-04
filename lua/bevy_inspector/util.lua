@@ -120,6 +120,7 @@ M.spawn_picker = function(data, opts)
 				preview_width = 0.7,
 				results_width = 0.3,
 			},
+			preview_cutoff = 20,
 		},
 		finder = finder,
 		sorter = conf.generic_sorter(),
@@ -177,9 +178,9 @@ M.entity_formatter = function(entry)
 
 	if comp ~= nil and comp.name ~= nil then
 		local name = comp.name
-		displayed = displayed .. ":" .. name
+		displayed = name .. ":" .. displayed
 	else
-		displayed = displayed .. ":Entity"
+		displayed = "Ent:" .. displayed
 	end
 
 	return {
@@ -219,7 +220,6 @@ M.watch_component = function(entity, component, bufnr)
 	local interval = 50
 	M.watch_timer:start(0, interval, vim.schedule_wrap(update_popup_content))
 end
-
 
 M.component_formatter = function(entry)
 	return {
