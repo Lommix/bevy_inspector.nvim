@@ -3,9 +3,7 @@
 A simple remote entity & component inspector inside Neovim
 using the telescope API with the new BRP-API introduced in bevy 0.15
 
-
 https://github.com/user-attachments/assets/266c6cee-c9fc-4a38-aeeb-75e46b41a3b2
-
 
 ## Installation
 
@@ -14,7 +12,6 @@ return {
 	"lommix/bevy_inspector.nvim",
 	dependencies = {
 		"nvim-telescope/telescope.nvim",
-        "MunifTanjim/nui.nvim",
         "nvim-lua/plenary.nvim",
 	},
 	config = function()
@@ -40,7 +37,7 @@ return {
 
 Mostly boils down to this:
 
-`entitie list` -> `show entity components` -> `watch single component`
+`entitie list` -> `show entity components` -> `live preview component`
 
 ## In Bevy
 

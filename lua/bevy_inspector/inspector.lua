@@ -1,11 +1,5 @@
 local bevy_api = require("bevy_inspector.api")
 local bevy_util = require("bevy_inspector.util")
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local previewers = require("telescope.previewers")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_states = require("telescope.actions.state")
 
 --- @class BevyInspector
 --- @field api BevyApi
