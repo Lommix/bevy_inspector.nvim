@@ -34,9 +34,9 @@ function Inspector:show_all_entities()
 		title = "select entity",
 		format = bevy_util.entity_formatter,
 		picker = bevy_util.entity_previewer,
-		callback = function(entry)
+		mappings = bevy_util.enter_action(function(entry)
 			self:show_entity_comps(entry)
-		end,
+		end),
 	})
 end
 
@@ -52,9 +52,9 @@ function Inspector:show_named_entities()
 		title = "select named entity",
 		format = bevy_util.entity_formatter,
 		picker = bevy_util.entity_previewer,
-		callback = function(entry)
+		mappings = bevy_util.enter_action(function(entry)
 			self:show_entity_comps(entry)
-		end,
+		end),
 	})
 end
 
@@ -68,12 +68,10 @@ function Inspector:show_entity_comps(entity)
 	end
 
 	bevy_util.spawn_picker(comps, {
-		title = "[Entity:" .. tostring(entity) .. "] select component to watch",
+		title = "[Entity:" .. tostring(entity) .. "]",
 		format = bevy_util.component_formatter,
 		picker = bevy_util.component_previewer(entity),
-		callback = function(entry)
-			self:watch_component(entity, entry)
-		end,
+		mappings = bevy_util.do_nothing(),
 	})
 end
 
@@ -88,7 +86,7 @@ function Inspector:query_component()
 	bevy_util.spawn_picker(comps, {
 		title = "select component to query",
 		format = bevy_util.component_formatter,
-		callback = function(entry)
+		mappings = bevy_util.enter_action(function(entry)
 			local entities = self.api:get_entites_with_component(entry)
 
 			if entities == nil then
@@ -99,53 +97,12 @@ function Inspector:query_component()
 				title = "select named entity",
 				format = bevy_util.entity_formatter,
 				picker = bevy_util.entity_previewer,
-				callback = function(entry)
+				mappings = bevy_util.enter_action(function(entry)
 					self:show_entity_comps(entry)
-				end,
+				end),
 			})
-		end,
+		end),
 	})
-end
-
----@param entity number
----@param component string
-function Inspector:watch_component(entity, component)
-	local Popup = require("nui.popup")
-	local event = require("nui.utils.autocmd").event
-	-- Create NUI popup
-	local popup = Popup({
-		enter = true,
-		focusable = true,
-		border = {
-			style = "single",
-			text = {
-				top = "[ Component Watcher ]",
-				top_align = "center",
-			},
-		},
-		position = "50%",
-		size = {
-			width = 60,
-			height = 20,
-		},
-	})
-
-	popup:mount()
-	local function update_popup_content()
-		local res = self.api:get_component_detail(entity, component)
-		local formatted = bevy_util.pretty_table_str(res)
-		vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, vim.split(formatted, "\n"))
-	end
-
-	local interval = 50
-	local timer = vim.loop.new_timer()
-	timer:start(0, interval, vim.schedule_wrap(update_popup_content))
-
-	popup:on(event.BufLeave, function()
-		timer:stop()
-		timer:close()
-		popup:unmount()
-	end)
 end
 
 return Inspector

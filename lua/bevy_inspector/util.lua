@@ -92,7 +92,7 @@ M.pretty_table_str = function(node)
 end
 
 ---@class BevyPicker
----@field callback fun(entry: table)?
+---@field mappings function
 ---@field title string?
 ---@field picker any?
 ---@field format fun(entry:any)?
@@ -123,14 +123,7 @@ M.spawn_picker = function(data, opts)
 		},
 		finder = finder,
 		sorter = conf.generic_sorter(),
-		attach_mappings = function(prompt_bufnr)
-			actions.select_default:replace(function()
-				local selection = action_states.get_selected_entry()
-				actions.close(prompt_bufnr)
-				opts.callback(selection.value)
-			end)
-			return true
-		end,
+		attach_mappings = opts.mappings,
 	})
 
 	if opts.picker ~= nil then
@@ -138,6 +131,25 @@ M.spawn_picker = function(data, opts)
 	end
 
 	picker:find()
+end
+
+---@param callback fun(entry : table|string)
+M.enter_action = function(callback)
+	return function(prompt_bufnr)
+		actions.select_default:replace(function()
+			local selection = action_states.get_selected_entry()
+			actions.close(prompt_bufnr)
+			callback(selection.value)
+		end)
+		return true
+	end
+end
+
+M.do_nothing = function()
+	return function()
+		actions.select_default:replace(function() end)
+		return true
+	end
 end
 
 M.entity_previewer = previewers.new_buffer_previewer({
@@ -180,19 +192,34 @@ end
 M.component_previewer = function(entity)
 	return previewers.new_buffer_previewer({
 		title = "components detail",
-		define_preview = function(buf, entry)
-			local api = require("bevy_inspector.api"):new()
-			local detail = api:get_component_detail(entity, entry.value)
-
-			if detail == nil then
-				return
-			end
-
-			local formatted = M.pretty_table_str(detail)
-			vim.api.nvim_buf_set_lines(buf.state.bufnr, 0, -1, false, vim.split(formatted, "\n"))
+		define_preview = function(preview, entry)
+			M.watch_component(entity, entry.value, preview.state.bufnr)
 		end,
 	})
 end
+
+M.watch_timer = vim.loop.new_timer()
+
+---@param entity number
+---@param component string
+---@param bufnr number
+M.watch_component = function(entity, component, bufnr)
+	local function update_popup_content()
+		local api = require("bevy_inspector.api"):new()
+		local res = api:get_component_detail(entity, component)
+		local formatted = M.pretty_table_str(res)
+
+		if vim.api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_buf_set_lines(bufnr, 1, -1, false, vim.split(formatted, "\n"))
+		else
+			M.watch_timer:stop()
+		end
+	end
+
+	local interval = 50
+	M.watch_timer:start(0, interval, vim.schedule_wrap(update_popup_content))
+end
+
 
 M.component_formatter = function(entry)
 	return {
