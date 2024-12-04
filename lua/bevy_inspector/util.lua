@@ -117,8 +117,8 @@ M.spawn_picker = function(data, opts)
 		prompt_title = opts.title,
 		layout_config = {
 			horizontal = {
-				preview_width = 0.6,
-				results_width = 0.4,
+				preview_width = 0.7,
+				results_width = 0.3,
 			},
 		},
 		finder = finder,
@@ -191,7 +191,7 @@ end
 
 M.component_previewer = function(entity)
 	return previewers.new_buffer_previewer({
-		title = "components detail",
+		title = "Component watch",
 		define_preview = function(preview, entry)
 			M.watch_component(entity, entry.value, preview.state.bufnr)
 		end,
