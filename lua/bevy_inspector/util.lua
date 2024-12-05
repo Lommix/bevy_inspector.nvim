@@ -208,6 +208,12 @@ M.watch_component = function(entity, component, bufnr)
 	local function update_popup_content()
 		local api = require("bevy_inspector.api"):new()
 		local res = api:get_component_detail(entity, component)
+
+		if res == nil then
+			M.watch_timer:stop()
+			return
+		end
+
 		local formatted = M.pretty_table_str(res)
 
 		if vim.api.nvim_buf_is_valid(bufnr) then
