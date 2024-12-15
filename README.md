@@ -33,6 +33,26 @@ return {
 }
 ```
 
+###with [`lazy.nvim`](https://github.com/folke/lazy.nvim)
+
+```lua
+return {
+	"lommix/bevy_inspector.nvim",
+	dependencies = {
+		"nvim-telescope/telescope.nvim",
+		"nvim-lua/plenary.nvim",
+	},
+	cmd = { "BevyInspect", "BevyInspectNamed", "BevyInspectQuery" },
+    -- stylua: ignore
+		keys = {
+			{  "<leader>bi", ":BevyInspect<Cr>", desc = "Lists all entities" },
+			{  "<leader>bia", ":BevyInspectNamed<Cr>", desc = "List all named entities" },
+			{  "<leader>biq", ":BevyInspectQuery<Cr>", desc = "Query a single component, continues to list all matching entities", },
+		},
+}
+
+```
+
 ## Control flow
 
 Mostly boils down to this:
