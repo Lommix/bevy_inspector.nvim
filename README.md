@@ -20,7 +20,7 @@ return {
 		-- require("bevy_inspector").setup({
 	        -- url = "http://127.0.0.1:15702",
         -- })
-
+	require("bevy_inspector").setup({})
         -- lists all entities
 		vim.keymap.set("n", "<leader>z", ":BevyInspect<Cr>", { silent = true })
 
@@ -42,6 +42,9 @@ return {
 		"nvim-telescope/telescope.nvim",
 		"nvim-lua/plenary.nvim",
 	},
+	config = function()
+		require("bevy_inspector").setup({})
+	end,
 	cmd = { "BevyInspect", "BevyInspectNamed", "BevyInspectQuery" },
     -- stylua: ignore
 	keys = {
