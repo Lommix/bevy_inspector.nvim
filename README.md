@@ -44,11 +44,11 @@ return {
 	},
 	cmd = { "BevyInspect", "BevyInspectNamed", "BevyInspectQuery" },
     -- stylua: ignore
-		keys = {
-			{  "<leader>bi", ":BevyInspect<Cr>", desc = "Lists all entities" },
-			{  "<leader>bia", ":BevyInspectNamed<Cr>", desc = "List all named entities" },
-			{  "<leader>biq", ":BevyInspectQuery<Cr>", desc = "Query a single component, continues to list all matching entities", },
-		},
+	keys = {
+		{  "<leader>bi", ":BevyInspect<Cr>", desc = "Lists all entities" },
+		{  "<leader>bia", ":BevyInspectNamed<Cr>", desc = "List all named entities" },
+		{  "<leader>biq", ":BevyInspectQuery<Cr>", desc = "Query a single component, continues to list all matching entities", },
+	},
 }
 
 ```
