@@ -20,7 +20,7 @@ return {
 		-- require("bevy_inspector").setup({
 	        -- url = "http://127.0.0.1:15702",
         -- })
-
+	require("bevy_inspector").setup({})
         -- lists all entities
 		vim.keymap.set("n", "<leader>z", ":BevyInspect<Cr>", { silent = true })
 
@@ -31,6 +31,29 @@ return {
 		vim.keymap.set("n", "<leader>i", ":BevyInspectQuery<Cr>", { silent = true })
 	end,
 }
+```
+
+###with [`lazy.nvim`](https://github.com/folke/lazy.nvim)
+
+```lua
+return {
+	"lommix/bevy_inspector.nvim",
+	dependencies = {
+		"nvim-telescope/telescope.nvim",
+		"nvim-lua/plenary.nvim",
+	},
+	config = function()
+		require("bevy_inspector").setup({})
+	end,
+	cmd = { "BevyInspect", "BevyInspectNamed", "BevyInspectQuery" },
+    -- stylua: ignore
+	keys = {
+		{  "<leader>bia", ":BevyInspect<Cr>", desc = "Lists all entities" },
+		{  "<leader>bin", ":BevyInspectNamed<Cr>", desc = "List all named entities" },
+		{  "<leader>biq", ":BevyInspectQuery<Cr>", desc = "Query a single component, continues to list all matching entities", },
+	},
+}
+
 ```
 
 ## Control flow
