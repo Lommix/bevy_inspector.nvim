@@ -4,6 +4,7 @@ local previewers = require("telescope.previewers")
 local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_states = require("telescope.actions.state")
+local bevy = require("bevy_inspector")
 
 local M = {}
 
@@ -174,11 +175,10 @@ M.entity_previewer = previewers.new_buffer_previewer({
 M.entity_formatter = function(entry)
 	local displayed = "[" .. tostring(entry.entity) .. "]"
 
-	local _, comp = next(entry.components)
+	local name_struct = bevy.opts.name_struct
 
-	if comp ~= nil and comp.name ~= nil then
-		local name = comp.name
-		displayed = name .. ":" .. displayed
+	if entry.components ~= nil and entry.components[name_struct] ~= nil then
+		displayed = entry.components[name_struct] .. " " .. displayed
 	else
 		displayed = "Ent:" .. displayed
 	end
