@@ -94,7 +94,7 @@ function BevyApi:get_named_entites()
 	return self:call("bevy/query", {
 		data = {
 			components = {
-				"bevy_core::name::Name",
+				self.config.name_struct,
 			},
 		},
 		filter = {},

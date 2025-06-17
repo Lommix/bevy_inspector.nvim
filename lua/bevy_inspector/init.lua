@@ -2,6 +2,7 @@
 ---@field url string
 local defaults = {
 	url = "http://127.0.0.1:15702",
+	name_struct = "bevy_ecs::name::Name",
 }
 
 --- @class BevyRemote

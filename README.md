@@ -18,6 +18,8 @@ return {
 		require("bevy_inspector").setup({
             -- optional custom url
 	        -- url = "http://127.0.0.1:15702",
+	    -- optional name struct, when bevy moves this again
+	        -- name_struct = "bevy_ecs::name::Name",
         })
 	end,
 	cmd = { "BevyInspect", "BevyInspectNamed", "BevyInspectQuery" },
@@ -46,3 +48,23 @@ app.add_plugins((
     RemoteHttpPlugin::default(),
 ));
 ```
+
+### Setup components
+
+```rust
+#[derive(Component, Debug, Reflect)]
+#[reflect(Component)]
+pub struct MyComponent {
+    pub name: String,
+    pub value: i32,
+}
+```
+
+### Register types
+
+```rust
+app.register_type::<MyComponent>();
+```
+
+
+
