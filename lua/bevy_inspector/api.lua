@@ -91,7 +91,7 @@ end
 --- gets all named entities
 --- @return QueryItem[] | nil
 function BevyApi:get_named_entites()
-	return self:call("bevy/query", {
+	return self:call("world.query", {
 		data = {
 			components = {
 				self.config.name_struct,
@@ -106,7 +106,7 @@ end
 --- @param filter table?
 --- @return table | nil
 function BevyApi:query(components, filter)
-	return self:call("bevy/query", {
+	return self:call("world.query", {
 		data = {
 			components = components,
 		},
@@ -117,7 +117,7 @@ end
 --- gets all entities
 --- @return QueryItem[] | nil
 function BevyApi:get_all_entites()
-	return self:call("bevy/query", {
+	return self:call("world.query", {
 		data = {},
 		filter = {},
 	})
@@ -127,7 +127,7 @@ end
 --- @return QueryItem[] | nil
 --- @param component string
 function BevyApi:get_entites_with_component(component)
-	return self:call("bevy/query", {
+	return self:call("world.query", {
 		data = {},
 		filter = {
 			with = {
@@ -141,7 +141,7 @@ end
 --- @param entity number
 --- @return table | nil
 function BevyApi:list_components(entity)
-	return self:call("bevy/list", {
+	return self:call("world.list_components", {
 		entity = entity,
 	})
 end
@@ -149,7 +149,7 @@ end
 --- gets a list of all components in the world
 --- @return table | nil
 function BevyApi:list_all_components()
-	return self:call("bevy/list")
+	return self:call("world.list_components")
 end
 
 --- gets component details from a list of component names
@@ -157,7 +157,7 @@ end
 --- @return table | nil
 function BevyApi:list_components_detailed(entity)
 	local components = self:list_components(entity)
-	return self:call("bevy/get", {
+	return self:call("world.get_components", {
 		entity = entity,
 		components = components,
 	})
@@ -168,7 +168,7 @@ end
 --- @param component string
 --- @return table | nil
 function BevyApi:get_component_detail(entity, component)
-	return self:call("bevy/get", {
+	return self:call("world.get_components", {
 		entity = entity,
 		components = { component },
 	})
@@ -179,7 +179,7 @@ end
 --- @param component string
 --- @return table | nil
 function BevyApi:watch_component(entity, component)
-	return self:call("bevy/get+watch", {
+	return self:call("world.get_components+watch", {
 		entity = entity,
 		components = { component },
 	})

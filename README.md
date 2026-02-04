@@ -5,6 +5,11 @@ using the telescope API with the new BRP-API introduced in bevy 0.15
 
 https://github.com/user-attachments/assets/266c6cee-c9fc-4a38-aeeb-75e46b41a3b2
 
+## Compatibility
+
+- for bevy 0.18+
+- ***for Bevy 17 and older use the `bevy_17` branch***
+
 ## Installation with [`lazy.nvim`](https://github.com/folke/lazy.nvim)
 
 ```lua
@@ -15,11 +20,9 @@ return {
 		"nvim-lua/plenary.nvim",
 	},
 	config = function()
-		require("bevy_inspector").setup({
+        require("bevy_inspector").setup({
             -- optional custom url
-	        -- url = "http://127.0.0.1:15702",
-	    -- optional name struct, when bevy moves this again
-	        -- name_struct = "bevy_ecs::name::Name",
+            -- url = "http://127.0.0.1:15702",
         })
 	end,
 	cmd = { "BevyInspect", "BevyInspectNamed", "BevyInspectQuery" },
